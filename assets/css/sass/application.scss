@@ -1,5 +1,19 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
+}
 
-  h1 { color: red; }
+table, th, td {
+   border: 1px solid black;
+}
+
+#board {
+  table-layout: fixed;
+  height: 100px;
+  width:  100px;
+
+  td {
+    width: 33%;
+    text-align: center;
+    vertical-align: middle;
+  }
 }

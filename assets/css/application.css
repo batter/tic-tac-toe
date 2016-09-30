@@ -1,2 +1,2 @@
-body{font-family:Arial, Helvetica, sans-serif}body h1{color:red}
+body{font-family:Arial, Helvetica, sans-serif}table,th,td{border:1px solid black}#board{table-layout:fixed;height:100px;width:100px}#board td{width:33%;text-align:center;vertical-align:middle}
 /*# sourceMappingURL=application.css.map */
