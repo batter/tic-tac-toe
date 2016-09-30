@@ -10,6 +10,26 @@ module TicTacToe
       ]
     end
 
+    def col1
+      [self.grid[0][0], self.grid[1][0], self.grid[2][0]]
+    end
+
+    def col2
+      [self.grid[0][0], self.grid[1][0], self.grid[2][0]]
+    end
+
+    def col3
+      [self.grid[0][0], self.grid[1][0], self.grid[2][0]]
+    end
+
+    def diag1
+      [self.grid[0][0], self.grid[1][1], self.grid[2][2]]
+    end
+
+    def diag2
+      [self.grid[2][0], self.grid[1][1], self.grid[0][2]]
+    end
+
     def row1
       self.grid[0]
     end
@@ -20,6 +40,14 @@ module TicTacToe
 
     def row3
       self.grid[2]
+    end
+
+    def sequences
+      [
+        col1, col2, col3,
+        row1, row2, row3,
+        diag1, diag2
+      ]
     end
 
     def to_h

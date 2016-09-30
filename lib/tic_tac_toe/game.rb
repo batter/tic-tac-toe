@@ -23,6 +23,19 @@ module TicTacToe
       }
     end
 
+    def winner
+      board.sequences.any? do |sequence|
+        player = sequence.compact.size == 3 &&
+          sequence.map(&:player).map(&:id).uniq.size == 1 &&
+            sequence.first.player
+        return player if player
+      end
+    end
+
+    def winner?
+      !!self.winner
+    end
+
     def move(player_id, coords)
       raise ArgumentError, '`coords` argument must be an array' unless coords.is_a?(Array)
 
