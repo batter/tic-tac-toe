@@ -23,27 +23,33 @@ module TicTacToe
 
       def initialize(game = nil, file_path = "#{STORE_DIRECTORY}/game.json")
         self.file_path = file_path
-        self.data = File.file?(file_path) && self.class.load(file_path)
-        self.game ||= game || load_game
+        if game
+          self.game = game
+          self.data = game.to_h
+        else
+          self.data = self.class.load(file_path)
+          self.game = load_game
+        end
       end
 
       def self.load(file_path = nil)
+        return unless File.file?(file_path)
         file_path ||= Dir["#{STORE_DIRECTORY}/*.json"].last
         file_path && JSON.parse(File.open(file_path, 'r') { |f| f.read }, symbolize_names: true)
       end
 
       def save
-        self.data = JSON.dump(game.to_h)
-        File.open(file_path, 'w') { |f| f.write(data) }
+        self.data = game.to_h
+        File.open(file_path, 'w') { |f| f.write(JSON.dump(self.data)) }
       end
 
       def load_game
-        self.game ||=
+        self.game ||= self.data &&
           TicTacToe::Game.new.tap do |game|
             player1 = data[:players].first
             player2 = data[:players].last
-            game.player1 = Player.new(player1[:name], player1[:symbol], player1[:id])
-            game.player2 = Player.new(player2[:name], player2[:symbol], player2[:id])
+            game.player1 = player1 && Player.new(player1[:name], player1[:symbol], player1[:id])
+            game.player2 = player2 && Player.new(player2[:name], player2[:symbol], player2[:id])
             game.board = Board.new.tap do |board|
               board.grid = data[:game].map do |row|
                 row.map do |obj|

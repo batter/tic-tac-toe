@@ -4,7 +4,6 @@ module TicTacToe
 
     def initialize
       self.board = Board.new
-      self.player1, self.player2 = Player.new('Player 1', 'X'), Player.new('Player 2', 'O')
     end
 
     def to_a
@@ -12,12 +11,12 @@ module TicTacToe
     end
 
     def players
-      [player1, player2]
+      [player1, player2].compact
     end
 
     def to_h
       {
-        players: players.map(&:to_h),
+        players: players.compact.map(&:to_h),
         game: board.to_h,
         board: board.to_simple_h
       }
