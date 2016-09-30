@@ -8,10 +8,11 @@ table, th, td {
 
 #board {
   table-layout: fixed;
-  height: 100px;
-  width:  100px;
+  height: 200px;
+  width:  200px;
 
   td {
+    height: 33%;
     width: 33%;
     text-align: center;
     vertical-align: middle;
