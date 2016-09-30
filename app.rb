@@ -52,7 +52,7 @@ class App < Roda
       r.post ':player_id/move' do |player_id|
         @game && @game.move(player_id, [params[:row].to_i, params[:col].to_i])
         @game_file.save
-        {move: success}
+        {move: true}
       end
 
       # GET /game/players

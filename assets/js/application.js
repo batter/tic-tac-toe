@@ -1,10 +1,10 @@
 function newGame() {
-  $.post('game/players/enter', function(data) {
-    $('#player_id').attr('data-id', data.id).html(data.name);
-  })
   $.post('/game', function(data) {
     fetchBoard();
   });
+  $.post('game/players/enter', function(data) {
+    $('#player_id').attr('data-id', data.id).html(data.name);
+  })
 }
 
 function fetchBoard() {

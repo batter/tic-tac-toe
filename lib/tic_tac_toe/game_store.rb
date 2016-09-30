@@ -14,6 +14,8 @@ module TicTacToe
 
     def self.new_game!
       self.current_game = GameFile.new(Game.new)
+      self.current_game.save
+      self.current_game
     end
 
     class GameFile
@@ -22,7 +24,7 @@ module TicTacToe
       def initialize(game = nil, file_path = "#{STORE_DIRECTORY}/game.json")
         self.file_path = file_path
         self.data = File.file?(file_path) && self.class.load(file_path)
-        self.game ||= load_game
+        self.game ||= game || load_game
       end
 
       def self.load(file_path = nil)
