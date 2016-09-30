@@ -1,18 +1,16 @@
 require 'roda'
-# require 'rack/indifferent'
+require 'rack/indifferent'
 require 'haml'
 require 'securerandom'
 require './lib/tic_tac_toe'
 
 class App < Roda
-
   plugin :hooks
   plugin :render, engine: 'haml'
   plugin :partials
   plugin :json
-  plugin :all_verbs
-  # plugin :params_capturing
   plugin :indifferent_params
+  plugin :all_verbs
   plugin :assets, css: 'application.css', js: 'application.js',
     js_compressor: :uglifier
 
