@@ -50,6 +50,7 @@ module TicTacToe
             player2 = data[:players][1]
             game.player1 = player1 && Player.new(player1[:name], player1[:symbol], player1[:id])
             game.player2 = player2 && Player.new(player2[:name], player2[:symbol], player2[:id])
+            game.turn = data[:turn]
             game.board = Board.new.tap do |board|
               board.grid = data[:game].map do |row|
                 row.map do |obj|

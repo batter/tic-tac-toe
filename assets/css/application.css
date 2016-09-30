@@ -1,2 +1,2 @@
-body{font-family:Arial, Helvetica, sans-serif}table,th,td{border:1px solid black}#board{table-layout:fixed;height:200px;width:200px}#board td{height:33%;width:33%;text-align:center;vertical-align:middle}
+body{font-family:Arial, Helvetica, sans-serif}table,th,td{border:1px solid black}#board{table-layout:fixed;height:200px;width:200px}#board td{height:33%;width:33%;text-align:center;vertical-align:middle}.hidden{display:none}
 /*# sourceMappingURL=application.css.map */

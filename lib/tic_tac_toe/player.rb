@@ -4,7 +4,7 @@ module TicTacToe
   class Player
     attr_accessor :name, :id, :symbol
 
-    def initialize(name, symbol, id = SecureRandom.uuid)
+    def initialize(name, symbol = 'X', id = SecureRandom.uuid)
       self.name = name
       self.symbol = symbol
       self.id = id

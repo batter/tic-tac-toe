@@ -1,16 +1,16 @@
+var player;
+
 function newGame() {
   $.post('/game', function(data) {
-    fetchBoard();
+    $('#choose_player').removeClass('hidden');
   });
-  $.post('game/players/enter', function(data) {
-    $('#player_id').attr('data-id', data.id).html(data.name);
-  })
 }
 
 function fetchBoard() {
-  return $.getJSON('/game', function (data) {
+  $.getJSON('/game', function (data) {
     writeBoard(data.board);
-  })
+  });
+  setTimeout(fetchBoard, 5000);
 }
 
 function writeBoard(board) {
@@ -21,7 +21,7 @@ function writeBoard(board) {
     var row = board[i];
     htmlBoard.append(jsonRowToHtml(row, i));
   }
-  addClickHandlers();
+  addBoardClickHandlers();
 }
 
 function jsonRowToHtml(row, index) {
@@ -33,13 +33,50 @@ function jsonRowToHtml(row, index) {
   return '<tr index=' + index + '>' + elements.join('') + '</tr>';
 }
 
-// handlers
-function addClickHandlers() {
+
+function addBoardClickHandlers() {
   $('#board tr td').click(function () {
     player_id = $('#player_id').attr('data-id');
     row = $(this).parent().attr('index');
     col = $(this).attr('index');
-    $.post('/game/' + player_id + '/move?row=' + row + '&col=' + col)
-    fetchBoard();
+    $.post('/game/' + player_id + '/move?row=' + row + '&col=' + col, function(data) {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        fetchBoard();
+      }
+    });
   });
 }
+
+function addJoinButton(num) {
+  $('#choose_player button').click(function () {
+    var playerName = prompt("Enger your name: ", "Player " + num);
+    if (playerName === null) { return; }
+    $('#choose_player').addClass('hidden');
+
+    $.post('game/players/join/' + playerName, function(data) {
+      if (data.error) {
+        alert('Game Full');
+      } else {
+        player = data;
+        $('#player_id').attr('data-id', player.id).html(player.name);
+        $('#board').removeClass('hidden');
+      }
+    }); 
+  });
+  $('#choose_player').removeClass('hidden');
+}
+
+// on load
+$(function() {
+  $.getJSON('/game/players', function(data) {
+    if (data.length < 2) {
+      addJoinButton(data.length + 1);
+    } else {
+      alert('Game in Progress, please watch');
+    }
+  });
+
+  fetchBoard();
+});

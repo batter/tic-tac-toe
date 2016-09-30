@@ -1,9 +1,21 @@
 module TicTacToe
   class Game
-    attr_accessor :board, :player1, :player2
+    attr_accessor :board, :player1, :player2, :turn
 
     def initialize
       self.board = Board.new
+    end
+
+    def add_player(name)
+      if players.size < 2
+        if player1.nil?
+          self.player1 = Player.new(name)
+          self.turn = player1.id
+          self.player1
+        else
+          self.player2 = Player.new(name, 'O')
+        end
+      end
     end
 
     def to_a
@@ -18,7 +30,8 @@ module TicTacToe
       {
         players: players.compact.map(&:to_h),
         game: board.to_h,
-        board: board.to_simple_h
+        board: board.to_simple_h,
+        turn: turn
       }
     end
 
@@ -37,14 +50,23 @@ module TicTacToe
 
     def move(player_id, coords)
       raise ArgumentError, '`coords` argument must be an array' unless coords.is_a?(Array)
+      return 'Please wait for a 2nd player before making your first move' unless players.size == 2
 
       player = players.select { |player| player.id == player_id }.first
       raise ArgumentError, "`player_id` arugment didn't match a valid player" unless player.is_a?(Player)
 
-      if board.grid[coords.first][coords.last].nil?
-        board.grid[coords.first][coords.last] = Move.new(player)
+      if turn == player_id
+        if board.grid[coords.first][coords.last].nil?
+          move = board.grid[coords.first][coords.last] = Move.new(player)
+
+          other_player = players.reject { |player| player.id == player_id }.first
+          self.turn = other_player && other_player.id
+          move
+        else
+          false
+        end
       else
-        return false
+        return 'Out of order, you must wait until the other player moves'
       end
     end
   end

@@ -18,6 +18,10 @@ class App < Roda
     @@root ||= Pathname.new(File.dirname(__FILE__))
   end
 
+  def save!
+    @game_file.save
+  end
+
   # before hook runs before every request execution
   before do
     @game_file = TicTacToe::GameStore.current_game
@@ -48,25 +52,38 @@ class App < Roda
       end
 
       r.post ':player_id/move' do |player_id|
-        @game && @game.move(player_id, [params[:row].to_i, params[:col].to_i])
-        @game_file.save
-        {move: true}
+        move = @game.move(player_id, [params[:row].to_i, params[:col].to_i])
+        if move.is_a?(TicTacToe::Move)
+          save!
+          if @game.winner?
+            {move: true, winner: @game.winner.to_h}
+          else
+            {move: true}
+          end
+        elsif move == false
+          {move: false, error: 'Please select an empty spot'}
+        else
+          {move: false, error: move}
+        end
       end
 
-      # GET /game/players
+      # /game/players
       r.on 'players' do
         r.is do
+          # GET /game/players
           r.get do
-            @game && @game.players.map(&:to_h) || []
+            @game.players.map(&:to_h) || []
           end
         end
 
-        r.post 'enter' do
-          @game && @game.players.sample.to_h
-        end
-
-        r.get 'enter' do
-          @game && @game.players.sample.to_h
+        # POST /game/players/join/:name
+        r.post 'join/:name' do |name|
+          if player = @game.add_player(name)
+            save!
+            player.to_h
+          else
+            {error: 'Game Full'}
+          end
         end
       end
       
