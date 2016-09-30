@@ -47,7 +47,7 @@ module TicTacToe
         self.game ||= self.data &&
           TicTacToe::Game.new.tap do |game|
             player1 = data[:players].first
-            player2 = data[:players].last
+            player2 = data[:players][1]
             game.player1 = player1 && Player.new(player1[:name], player1[:symbol], player1[:id])
             game.player2 = player2 && Player.new(player2[:name], player2[:symbol], player2[:id])
             game.board = Board.new.tap do |board|
