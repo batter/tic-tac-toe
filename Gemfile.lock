@@ -7,8 +7,6 @@ GEM
     haml (4.0.7)
       tilt
     rack (2.0.1)
-    rack-cache (1.6.1)
-      rack (>= 0.4)
     rack-indifferent (1.2.0)
       rack (>= 1.5)
     rake (10.4.2)
@@ -30,7 +28,6 @@ PLATFORMS
 
 DEPENDENCIES
   haml (~> 4.0, >= 4.0.7)
-  rack-cache (~> 1.6, >= 1.6.1)
   rack-indifferent (~> 1.2)
   rake (> 10.0)
   roda (~> 2.18)
