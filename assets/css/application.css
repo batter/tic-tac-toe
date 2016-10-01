@@ -1,2 +1,2 @@
-body{font-family:Arial, Helvetica, sans-serif}table,th,td{border:1px solid black}#board{table-layout:fixed;height:200px;width:200px}#board td{height:33%;width:33%;text-align:center;vertical-align:middle}.hidden{display:none}
+body{font-family:Arial, Helvetica, sans-serif}table,th,td{border:1px solid black}#board{table-layout:fixed;height:200px;width:200px}#board td{height:33%;width:33%;text-align:center;vertical-align:middle}.seperator{padding:0 10px}.bold{font-style:bold}.left{float:left}.clear{clear:both}.hidden{display:none}.prepend-top{margin-top:1.5em}.append-bottom{margin-bottom:1.5em}.prepend-left{margin-left:1.5em}.append-right{margin-right:1.5em}
 /*# sourceMappingURL=application.css.map */

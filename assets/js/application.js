@@ -1,17 +1,36 @@
-var player;
+var currentPlayer = {};
+var players;
 
 function newGame() {
+  currentPlayer = {};
+  players = undefined;
+
   $.post('/game', function(data) {
-    $('#choose_player').removeClass('hidden');
+    updateState(data);
+    setupJoinButton(1);
   });
 }
+
+function updateState(data) {
+  if (data) {
+    if (data.players) {
+      writePlayers(data.players);
+    }
+    if (data.board) {
+      writeBoard(data.board);
+    }
+  }
+}
+
+// -- START Board-related functions --
 
 function fetchBoard() {
   $.getJSON('/game', function (data) {
-    writeBoard(data.board);
+    updateState(data);
   });
   setTimeout(fetchBoard, 5000);
 }
+
 
 function writeBoard(board) {
   var htmlBoard = $('#board');
@@ -19,12 +38,11 @@ function writeBoard(board) {
 
   for (var i = 0; i < board.length; i++) {
     var row = board[i];
-    htmlBoard.append(jsonRowToHtml(row, i));
+    htmlBoard.append(jsonBoardRowToHtml(row, i));
   }
-  addBoardClickHandlers();
 }
 
-function jsonRowToHtml(row, index) {
+function jsonBoardRowToHtml(row, index) {
   var elements = row.map(function (obj, i) {
     var value = (obj === null) ?  '' : obj;
     return '<td index=' + i + '>' + value + '</td>'
@@ -33,23 +51,50 @@ function jsonRowToHtml(row, index) {
   return '<tr index=' + index + '>' + elements.join('') + '</tr>';
 }
 
-
 function addBoardClickHandlers() {
   $('#board tr td').click(function () {
-    player_id = $('#player_id').attr('data-id');
     row = $(this).parent().attr('index');
     col = $(this).attr('index');
-    $.post('/game/' + player_id + '/move?row=' + row + '&col=' + col, function(data) {
-      if (data.error) {
+    $.post('/game/' + currentPlayer.id + '/move?row=' + row + '&col=' + col, function(data) {
+      if (data.move === false && data.error) {
         alert(data.error);
-      } else {
-        fetchBoard();
+      } else if (data.move === true) {
+        writeBoard(data.board);
+
+        if (data.winner) {
+          alert('You win! Congratulations!');
+        }
       }
     });
   });
 }
 
-function addJoinButton(num) {
+// -- END Board-related functions --
+
+// -- START Player-related functions --
+
+function buildPlayerHtml(obj) {
+  var classString = currentPlayer.id === obj.id ? 'left' : 'left bold';
+
+  return(
+    '<div data-id="' + obj.id + '" class="' + classString + '">' +
+      obj.name +
+    '</div>'
+  );
+}
+
+function writePlayers(players) {
+  var htmlPlayers = $('#players');
+  htmlPlayers.empty();
+
+  htmlPlayers.append(
+    players.map(function (p) {
+      return buildPlayerHtml(p);
+    }).join('<div class="seperator left">vs</div>')
+  );
+}
+
+function setupJoinButton(num) {
   $('#choose_player button').click(function () {
     var playerName = prompt("Enger your name: ", "Player " + num);
     if (playerName === null) { return; }
@@ -59,8 +104,8 @@ function addJoinButton(num) {
       if (data.error) {
         alert('Game Full');
       } else {
-        player = data;
-        $('#player_id').attr('data-id', player.id).html(player.name);
+        currentPlayer = data.player;
+        addBoardClickHandlers();
         $('#board').removeClass('hidden');
       }
     }); 
@@ -68,15 +113,17 @@ function addJoinButton(num) {
   $('#choose_player').removeClass('hidden');
 }
 
+// -- END Player-related functions --
+
 // on load
 $(function() {
+  fetchBoard();
+
   $.getJSON('/game/players', function(data) {
     if (data.length < 2) {
-      addJoinButton(data.length + 1);
+      setupJoinButton(data.length + 1);
     } else {
       alert('Game in Progress, please watch');
     }
   });
-
-  fetchBoard();
 });

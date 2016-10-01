@@ -19,4 +19,14 @@ table, th, td {
   }
 }
 
+.seperator { padding: 0 10px; }
+.bold { font-style: bold; }
+
+.left { float: left; }
+.clear { clear: both; }
 .hidden { display: none; }
+
+.prepend-top   { margin-top: 1.5em; }
+.append-bottom { margin-bottom: 1.5em; }
+.prepend-left  { margin-left: 1.5em; }
+.append-right  { margin-right: 1.5em; }
