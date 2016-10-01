@@ -26,28 +26,6 @@ module TicTacToe
       [player1, player2].compact
     end
 
-    def to_h
-      {
-        players: players.compact.map(&:to_h),
-        game: board.to_h,
-        board: board.to_simple_h,
-        turn: turn
-      }
-    end
-
-    def winner
-      board.sequences.any? do |sequence|
-        player = sequence.compact.size == 3 &&
-          sequence.map(&:player).map(&:id).uniq.size == 1 &&
-            sequence.first.player
-        return player if player
-      end
-    end
-
-    def winner?
-      !!self.winner
-    end
-
     def move(player_id, coords)
       raise ArgumentError, '`coords` argument must be an array' unless coords.is_a?(Array)
       return 'Please wait for a 2nd player before making your first move' unless players.size == 2
@@ -63,11 +41,39 @@ module TicTacToe
           self.turn = other_player && other_player.id
           move
         else
-          false
+          'Please select an empty spot'
         end
       else
-        return 'Out of order, you must wait until the other player moves'
+        'Out of order, you must wait until the other player moves'
       end
+    end
+
+    def simple_state
+      {
+        board: board.to_simple_h,
+        players: players.compact.map(&:to_h)
+      }
+    end
+
+    def to_h
+      self.simple_state.merge({
+        game: board.to_h,
+        turn: turn,
+        winner: winner
+      })
+    end
+
+    def winner
+      board.sequences.any? do |sequence|
+        player = sequence.compact.size == 3 &&
+          sequence.map(&:player).map(&:id).uniq.size == 1 &&
+            sequence.first.player
+        return player if player
+      end
+    end
+
+    def winner?
+      !!self.winner
     end
   end
 end

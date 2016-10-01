@@ -28,6 +28,8 @@ class App < Roda
     @game = @game_file.game
   end
 
+  after { save! }
+
   route do |r|
     r.assets unless ENV['RACK_ENV'] == 'production'
 
@@ -40,30 +42,26 @@ class App < Roda
         # get current game state
         # GET /game
         r.get do
-          @game.to_h
+          @game.simple_state
         end
 
         # create a new game
         # POST /game
         r.post do
           @game_file = TicTacToe::GameStore.new_game!
-          @game_file.game.to_h
+          @game.simple_state
         end
       end
 
       r.post ':player_id/move' do |player_id|
         move = @game.move(player_id, [params[:row].to_i, params[:col].to_i])
         if move.is_a?(TicTacToe::Move)
-          save!
-          if @game.winner?
-            {move: true, winner: @game.winner.to_h}
-          else
-            {move: true}
-          end
-        elsif move == false
-          {move: false, error: 'Please select an empty spot'}
+          @game.simple_state.merge({
+            move: true,
+            winner: @game.winner && @game.winner.to_h
+          })
         else
-          {move: false, error: move}
+          {move: false, error: move.to_s}
         end
       end
 
@@ -78,15 +76,13 @@ class App < Roda
 
         # POST /game/players/join/:name
         r.post 'join/:name' do |name|
-          if player = @game.add_player(name)
-            save!
-            player.to_h
+          if player = @game.add_player(name.gsub(/%20/, ' '))
+            @game.simple_state.merge(player: player.to_h)
           else
             {error: 'Game Full'}
           end
         end
       end
-      
     end
   end
 end
