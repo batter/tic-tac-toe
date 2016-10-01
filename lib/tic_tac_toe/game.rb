@@ -27,6 +27,8 @@ module TicTacToe
     end
 
     def move(player_id, coords)
+      return "The game is already over, #{winner.name} won" if winner?
+
       raise ArgumentError, '`coords` argument must be an array' unless coords.is_a?(Array)
       return 'Please wait for a 2nd player before making your first move' unless players.size == 2
 
@@ -51,25 +53,26 @@ module TicTacToe
     def simple_state
       {
         board: board.to_simple_h,
-        players: players.compact.map(&:to_h)
+        players: players.compact.map(&:to_h),
+        turn: turn
       }
     end
 
     def to_h
       self.simple_state.merge({
         game: board.to_h,
-        turn: turn,
-        winner: winner
+        winner: winner? && winner.to_h
       })
     end
 
     def winner
-      board.sequences.any? do |sequence|
-        player = sequence.compact.size == 3 &&
-          sequence.map(&:player).map(&:id).uniq.size == 1 &&
-            sequence.first.player
-        return player if player
-      end
+      @winner ||=
+        board.sequences.any? do |sequence|
+          player = sequence.compact.size == 3 &&
+            sequence.map(&:player).map(&:id).uniq.size == 1 &&
+              sequence.first.player
+          return player if player
+        end
     end
 
     def winner?

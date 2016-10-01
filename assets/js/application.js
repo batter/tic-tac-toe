@@ -1,24 +1,26 @@
 var currentPlayer = {};
 var players;
 
-function newGame() {
-  currentPlayer = {};
-  players = undefined;
+var EMPTY_BOARD = [[null, null, null],[null, null, null],[null, null, null]];
 
-  $.post('/game', function(data) {
-    updateState(data);
-    setupJoinButton(1);
-  });
+function newGame() {
+  if (confirm("This will blow away the current game, are you sure?")) {
+    updateState({players: [], board: EMPTY_BOARD});
+    currentPlayer = {};
+    players = undefined;
+
+    $.post('/game', function(data) {
+      setupJoinButton(1);
+    });
+  }
 }
 
 function updateState(data) {
-  if (data) {
-    if (data.players) {
-      writePlayers(data.players);
-    }
-    if (data.board) {
-      writeBoard(data.board);
-    }
+  if (data && data.players) {
+    writePlayers(data.players);
+  }
+  if (data && data.board) {
+    writeBoard(data.board);
   }
 }
 
@@ -31,7 +33,6 @@ function fetchBoard() {
   setTimeout(fetchBoard, 5000);
 }
 
-
 function writeBoard(board) {
   var htmlBoard = $('#board');
   htmlBoard.empty();
@@ -40,6 +41,8 @@ function writeBoard(board) {
     var row = board[i];
     htmlBoard.append(jsonBoardRowToHtml(row, i));
   }
+
+  addBoardClickHandlers();
 }
 
 function jsonBoardRowToHtml(row, index) {
@@ -52,21 +55,23 @@ function jsonBoardRowToHtml(row, index) {
 }
 
 function addBoardClickHandlers() {
-  $('#board tr td').click(function () {
-    row = $(this).parent().attr('index');
-    col = $(this).attr('index');
-    $.post('/game/' + currentPlayer.id + '/move?row=' + row + '&col=' + col, function(data) {
-      if (data.move === false && data.error) {
-        alert(data.error);
-      } else if (data.move === true) {
-        writeBoard(data.board);
+  if (currentPlayer.id) {
+    $('#board tr td').click(function () {
+      row = $(this).parent().attr('index');
+      col = $(this).attr('index');
+      $.post('/game/' + currentPlayer.id + '/move?row=' + row + '&col=' + col, function(data) {
+        if (data.move === false && data.error) {
+          alert(data.error);
+        } else if (data.move === true) {
+          writeBoard(data.board);
 
-        if (data.winner) {
-          alert('You win! Congratulations!');
+          if (data.winner) {
+            alert('You win! Congratulations!');
+          }
         }
-      }
+      });
     });
-  });
+  }
 }
 
 // -- END Board-related functions --
@@ -95,20 +100,21 @@ function writePlayers(players) {
 }
 
 function setupJoinButton(num) {
-  $('#choose_player button').click(function () {
+  $('#choose_player button.joiner').click(function () {
     var playerName = prompt("Enger your name: ", "Player " + num);
-    if (playerName === null) { return; }
-    $('#choose_player').addClass('hidden');
+    if (playerName !== null) {
+      $('#choose_player').addClass('hidden');
 
-    $.post('game/players/join/' + playerName, function(data) {
-      if (data.error) {
-        alert('Game Full');
-      } else {
-        currentPlayer = data.player;
-        addBoardClickHandlers();
-        $('#board').removeClass('hidden');
-      }
-    }); 
+      $.post('game/players/join/' + playerName, function(data) {
+        if (data.error) {
+          alert('Game Full');
+        } else {
+          currentPlayer = data.player;
+          updateState(data);
+          $('#board').removeClass('hidden');
+        }
+      });
+    }
   });
   $('#choose_player').removeClass('hidden');
 }
@@ -117,6 +123,7 @@ function setupJoinButton(num) {
 
 // on load
 $(function() {
+  writeBoard(EMPTY_BOARD);
   fetchBoard();
 
   $.getJSON('/game/players', function(data) {
