@@ -10,4 +10,8 @@ class Player
 
   validates_inclusion_of :symbol, in: VALID_SYMBOLS
 
+  def to_h
+    attributes.merge(_id: self.id.to_s)
+  end
+
 end

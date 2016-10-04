@@ -52,22 +52,26 @@ class Game
   end
 
   def to_h
-    self.attributes.merge({
-      players: players.map(&:attributes),
-      winner: winner? && winner.to_h
+    attributes.merge({
+      players: players.map(&:to_h),
+      winner: winner? && winner.to_h,
+      _id: self.id.to_s
     })
   end
 
   def winner
-    @winner ||=
-      board_sequences.detect do |sequence|
-        sequence.compact.size == 3 &&
-          sequence.uniq.size == 1 &&
-            players.find_by_symbol(sequence.first)
-      end
+    @winner ||= winning_sequence && players.find_by_symbol(winning_sequence.first)
   end
 
   def winner?
-    !!self.winner
+    !!winning_sequence
+  end
+
+  private
+
+  def winning_sequence
+    @winning_sequence ||= board_sequences.detect do |sequence|
+      sequence.compact.size == 3 && sequence.uniq.size == 1
+    end
   end
 end

@@ -49,7 +49,7 @@ class App < Roda
 
       r.post ':player_id/move' do |player_id|
         move = @game.move(player_id, [params[:row].to_i, params[:col].to_i])
-        unless move == true
+        if move == true
           @game.to_h.merge(move: true)
         else
           {move: false, error: move.to_s}
@@ -61,14 +61,14 @@ class App < Roda
         r.is do
           # GET /game/players
           r.get do
-            @game.players.map(&:attributes)
+            @game.players.map(&:to_h)
           end
         end
 
         # POST /game/players/join/:name
         r.post 'join/:name' do |name|
-          if player = @game.add_player(name.gsub(/%20/, ' '))
-            @game.to_h.merge(player: player.to_h)
+          if @game.add_player!(name.gsub(/%20/, ' '))
+            @game.to_h.merge(player: @game.players.last.to_h)
           else
             {error: 'Game Full'}
           end
