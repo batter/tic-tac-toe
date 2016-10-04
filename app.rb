@@ -1,8 +1,9 @@
 require 'roda'
-require 'rack/indifferent'
 require 'haml'
-require 'securerandom'
-require './lib/tic_tac_toe'
+require 'json'
+require 'rack/indifferent'
+
+Dir["#{File.dirname(__FILE__)}/models/*.rb"].each { |f| require f }
 
 class App < Roda
   plugin :hooks
@@ -18,17 +19,10 @@ class App < Roda
     @@root ||= Pathname.new(File.dirname(__FILE__))
   end
 
-  def save!
-    @game_file.save
-  end
-
   # before hook runs before every request execution
   before do
-    @game_file = TicTacToe::GameStore.current_game
-    @game = @game_file.game
+    @game = Game.last || Game.new
   end
-
-  after { save! }
 
   route do |r|
     r.assets unless ENV['RACK_ENV'] == 'production'
@@ -42,24 +36,21 @@ class App < Roda
         # get current game state
         # GET /game
         r.get do
-          @game.simple_state
+          @game.to_h
         end
 
         # create a new game
         # POST /game
         r.post do
-          @game_file = TicTacToe::GameStore.new_game!
-          @game.simple_state
+          @game = Game.create!
+          @game.to_h
         end
       end
 
       r.post ':player_id/move' do |player_id|
         move = @game.move(player_id, [params[:row].to_i, params[:col].to_i])
-        if move.is_a?(TicTacToe::Move)
-          @game.simple_state.merge({
-            move: true,
-            winner: @game.winner && @game.winner.to_h
-          })
+        unless move == true
+          @game.to_h.merge(move: true)
         else
           {move: false, error: move.to_s}
         end
@@ -70,14 +61,14 @@ class App < Roda
         r.is do
           # GET /game/players
           r.get do
-            @game.players.map(&:to_h) || []
+            @game.players.map(&:attributes)
           end
         end
 
         # POST /game/players/join/:name
         r.post 'join/:name' do |name|
           if player = @game.add_player(name.gsub(/%20/, ' '))
-            @game.simple_state.merge(player: player.to_h)
+            @game.to_h.merge(player: player.to_h)
           else
             {error: 'Game Full'}
           end
