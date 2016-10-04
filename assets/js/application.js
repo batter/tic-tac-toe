@@ -55,11 +55,11 @@ function jsonBoardRowToHtml(row, index) {
 }
 
 function addBoardClickHandlers() {
-  if (currentPlayer.id) {
+  if (currentPlayer._id) {
     $('#board tr td').click(function () {
       row = $(this).parent().attr('index');
       col = $(this).attr('index');
-      $.post('/game/' + currentPlayer.id + '/move?row=' + row + '&col=' + col, function(data) {
+      $.post('/game/' + currentPlayer._id + '/move?row=' + row + '&col=' + col, function(data) {
         if (data.move === false && data.error) {
           alert(data.error);
         } else if (data.move === true) {
@@ -79,10 +79,10 @@ function addBoardClickHandlers() {
 // -- START Player-related functions --
 
 function buildPlayerHtml(obj) {
-  var classString = currentPlayer.id === obj.id ? 'left' : 'left bold';
+  var classString = currentPlayer._id === obj._id ? 'left' : 'left bold';
 
   return(
-    '<div data-id="' + obj.id + '" class="' + classString + '">' +
+    '<div data-id="' + obj._id + '" class="' + classString + '">' +
       obj.name +
     '</div>'
   );
@@ -124,7 +124,6 @@ function setupJoinButton(num) {
 // on load
 $(function() {
   writeBoard(EMPTY_BOARD);
-  fetchBoard();
 
   $.getJSON('/game/players', function(data) {
     if (data.length < 2) {
@@ -133,4 +132,6 @@ $(function() {
       alert('Game in Progress, please watch');
     }
   });
+
+  fetchBoard();
 });
