@@ -9,7 +9,7 @@ gem 'uglifier', '~> 3.0' # JS compressor
 
 gem 'mongoid', '~> 6.0'
 
-gem 'thin', '~> 1.7' # Use Thin as the webserver
+gem 'thin', '~> 1.7', require: false # Use Thin as the webserver
 gem 'rake', '> 10.0'
 
 group :development do
