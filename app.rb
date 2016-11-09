@@ -3,7 +3,7 @@ require 'haml'
 require 'json'
 require 'rack/indifferent'
 
-Dir["#{File.dirname(__FILE__)}/models/*.rb"].each { |f| require f }
+require File.expand_path('../models/all', __FILE__)
 
 class App < Roda
   plugin :hooks
