@@ -80,12 +80,8 @@ class Game
   protected
 
   def check_game_status!
-    if winner?
-      self.winner_symbol = winner.symbol
-      self.game_over = true
-    elsif board_full?
-      self.game_over = true
-    end
+    self.winner_symbol = winner.symbol if self.winner?
+    self.game_over = self.winner? || self.board_full?
   end
 
   def winning_sequence
