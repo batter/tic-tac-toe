@@ -10,7 +10,10 @@ class Game
 
   field :board, type: Array, default: DEFAULT_BOARD
   field :winner_symbol
+  field :game_over, type: Boolean, default: false
   field :current_turn_symbol, default: Player::VALID_SYMBOLS.first
+
+  index({winner_symbol: 1, game_over: 1})
 
   embeds_many :players do
     def find_by_symbol(symbol)
@@ -18,8 +21,8 @@ class Game
     end
   end
 
-  scope :unfinished, -> { where(winner_symbol: nil) }
-  scope :finished, -> { where.not(winner_symbol: nil) }
+  scope :unfinished, -> { where.not(game_over: true) }
+  scope :finished,   -> { where(game_over: true) }
 
   def add_player!(name)
     symbol = players.size == 1 ? 'O' : 'X'
@@ -39,9 +42,10 @@ class Game
       if board[coords.first][coords.last].nil?
         # Make the desired move
         self.board[coords.first][coords.last] = player.symbol
+        # check to see if there is a winner or the game is full
+        self.check_game_status!
         # Advance the turn sequence
-        next_turn_symbol = player.symbol == 'X' ? 'O' : 'X'
-        self.current_turn_symbol = next_turn_symbol
+        self.current_turn_symbol = player.symbol == 'X' ? 'O' : 'X'
         self.save
       else
         'Please select an empty spot'
@@ -55,23 +59,38 @@ class Game
     attributes.merge({
       players: players.map(&:to_h),
       winner: winner? && winner.to_h,
+      game_over: winner? || board_full?,
       _id: self.id.to_s
     })
   end
 
   def winner
-    @winner ||= winning_sequence && players.find_by_symbol(winning_sequence.first)
+    @winner ||= self.winning_sequence && players.find_by_symbol(winning_sequence.first)
   end
 
   def winner?
     !!winning_sequence
   end
 
-  private
+  def board_full?
+    @board_full ||=
+      board_sequences.all? { |sequence| sequence.compact.size == board.size }
+  end
+
+  protected
+
+  def check_game_status!
+    if winner?
+      self.winner_symbol = winner.symbol
+      self.game_over = true
+    elsif board_full?
+      self.game_over = true
+    end
+  end
 
   def winning_sequence
     @winning_sequence ||= board_sequences.detect do |sequence|
-      sequence.compact.size == 3 && sequence.uniq.size == 1
+      sequence.compact.size == board.size && sequence.uniq.size == 1
     end
   end
 end

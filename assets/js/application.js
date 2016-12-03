@@ -97,6 +97,10 @@ function writePlayers(players) {
       return buildPlayerHtml(p);
     }).join('<div class="seperator left">vs</div>')
   );
+
+  if (players.length < 2) {
+    setupJoinButton(players.length + 1);
+  }
 }
 
 function setupJoinButton(num) {
@@ -126,9 +130,7 @@ $(function() {
   writeBoard(EMPTY_BOARD);
 
   $.getJSON('/game/players', function(data) {
-    if (data.length < 2) {
-      setupJoinButton(data.length + 1);
-    } else {
+    if (data.length === 2) {
       alert('Game in Progress, please watch');
     }
   });
