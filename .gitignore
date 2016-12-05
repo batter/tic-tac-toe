@@ -6,6 +6,7 @@
 
 # Ignore mac dir files
 .DS_Store
+.rspec
 
 # Ignore SASS Cache and Map files
 /.sass-cache

@@ -15,3 +15,11 @@ gem 'rake', '> 10.0'
 group :development do
   gem 'shotgun', '~> 0.9.2'
 end
+
+group :development, :test do
+  gem 'pry-nav', '~> 0.2.4'
+end
+
+group :test do
+  gem 'rspec', '~> 3.5'
+end
