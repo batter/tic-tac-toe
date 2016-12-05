@@ -18,6 +18,7 @@ end
 
 group :development, :test do
   gem 'pry-nav', '~> 0.2.4'
+  gem 'database_cleaner', '~> 1.5'
 end
 
 group :test do
