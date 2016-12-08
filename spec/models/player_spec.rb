@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Player, type: :model do
+  it { expect(Game.included_modules.include?(Mongoid::Document)).to eq(true) }
+
   describe "Constants" do
     describe :VALID_SYMBOLS do
       it { expect(Player.const_defined?(:VALID_SYMBOLS)).to eq(true) }
