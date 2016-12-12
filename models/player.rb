@@ -8,6 +8,7 @@ class Player
 
   embedded_in :game
 
+  validates_presence_of :name
   validates_inclusion_of :symbol, in: VALID_SYMBOLS
 
   def to_h
