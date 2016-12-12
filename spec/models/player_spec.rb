@@ -4,7 +4,7 @@ describe Player, type: :model do
   let(:attributes) { { name: 'Ben', symbol: Player::VALID_SYMBOLS.sample } }
   let(:instance) { Player.new(attributes) }
 
-  it { expect(Game.included_modules.include?(Mongoid::Document)).to eq(true) }
+  it { expect(Game.included_modules).to include(Mongoid::Document) }
 
   describe "Constants" do
     describe :VALID_SYMBOLS do
