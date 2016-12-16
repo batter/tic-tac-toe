@@ -21,7 +21,7 @@ class Game
     end
   end
 
-  scope :unfinished, -> { where.not(game_over: true) }
+  scope :unfinished, -> { where(game_over: false) }
   scope :finished,   -> { where(game_over: true) }
 
   def add_player!(name)

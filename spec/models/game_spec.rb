@@ -22,4 +22,21 @@ describe Game, type: :model do
       end
     end
   end
+
+  describe "Scopes" do
+    let!(:new_game) { game }
+    let!(:finished_game) { Game.create(game_over: true, winner_symbol: 'X') }
+
+    describe :unfinished do
+      it "should return unfinished games" do
+        expect(Game.unfinished).to include(new_game)
+      end
+    end
+
+    describe :finished do
+      it "should return finished games" do
+        expect(Game.finished).to include(finished_game)
+      end
+    end
+  end
 end
