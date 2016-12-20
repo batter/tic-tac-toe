@@ -39,4 +39,33 @@ describe Game, type: :model do
       end
     end
   end
+
+  describe "Methods" do
+    subject { Game.new(attributes) }
+    let(:attributes) { {} }
+
+    describe :winner? do
+      it { is_expected.to respond_to(:winner?) }
+
+      it "should be false if theres no winning sequence" do
+        expect(subject.winner?).to eq(false)
+      end
+
+      context 'winning sequence' do
+        let(:attributes) do
+          {
+            board: [
+              ['X', 'X', 'X'],
+              Array.new(3),
+              Array.new(3)
+            ]
+          }
+        end
+
+        it "should respond with true if there's a winning sequence" do
+          expect(subject.winner?).to eq(true)
+        end
+      end
+    end
+  end
 end
