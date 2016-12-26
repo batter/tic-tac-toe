@@ -44,6 +44,36 @@ describe Game, type: :model do
     subject { Game.new(attributes) }
     let(:attributes) { {} }
 
+    describe :move do
+      it { is_expected.to respond_to(:move) }
+
+      context "invalid arguments" do
+        context "game hasn't started" do
+          it { expect(subject.move(1, nil)).to eq('Please wait for a 2nd player before making your first move') }
+        end
+
+        context "wrong argument for coords" do
+          before { expect(subject).to receive(:players) { Array.new(2) } }
+
+          it "should raise an error" do
+            expect { subject.move(1, nil) }.to(
+              raise_error(ArgumentError, '`coords` argument must be an array')
+            )
+          end
+        end
+
+        context "invalid `player_id` argument" do
+          before { expect(subject).to receive(:players).twice { Array.new(2) } }
+
+          it "should raise an error" do
+            expect { subject.move(1, [0,0]) }.to(
+              raise_error(ArgumentError, "`player_id` arugment didn't match a valid player")
+            )
+          end
+        end
+      end
+    end
+
     describe :winner? do
       it { is_expected.to respond_to(:winner?) }
 
