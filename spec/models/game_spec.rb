@@ -72,6 +72,17 @@ describe Game, type: :model do
           end
         end
       end
+
+      context "valid arguments" do
+        let!(:game) { subject.save && subject }
+        let!(:player1) { game.add_player!('Ben') }
+        let!(:player2) { game.add_player!('Beth') }
+
+        it "should place a symbol on the board" do
+          game.move(player1.id, [0,0])
+          expect(game.board[0][0]).to eq(player1.symbol)
+        end
+      end
     end
 
     describe :winner? do
