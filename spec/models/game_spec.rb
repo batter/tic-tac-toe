@@ -77,10 +77,11 @@ describe Game, type: :model do
         let!(:game) { subject.save && subject }
         let!(:player1) { game.add_player!('Ben') }
         let!(:player2) { game.add_player!('Beth') }
+        let(:coords) { [Random.rand(3), Random.rand(3)] }
 
         it "should place a symbol on the board" do
-          game.move(player1.id, [0,0])
-          expect(game.board[0][0]).to eq(player1.symbol)
+          game.move(player1.id, coords)
+          expect(game.board[coords.first][coords.last]).to eq(player1.symbol)
         end
       end
     end
